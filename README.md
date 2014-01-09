@@ -16,5 +16,7 @@ How to run it?
 
 5) type "http-server" in the command line
 
+6) open webpage "http://localhost:8080"
+
 Now it works!
 
