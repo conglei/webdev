@@ -1,0 +1,114 @@
+<html>
+<head>
+    <title> Web Development Demo</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <style>
+        .chart rect {
+            fill: steelblue;
+            stroke: white;
+        }
+    </style>
+</head>
+
+
+<body>
+<script>
+    var t = 1,
+        v = 70;
+        l = 33;
+    var data = [];
+    data = data.concat(next(l));
+    var requests = [];
+
+    //    function next(){
+    //        return {
+    //            time: t++,
+    //            value: v = Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
+    //        }
+    //    }
+
+    function next(number){
+        var returnData;
+        $.ajax({
+            url: '/getdata/data?num=' + number,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                returnData = data;
+            }
+        });
+        return returnData;
+    }
+
+    var w = 20;
+    var h = 80;
+    var x = d3.scale.linear()
+            .domain([0,1])
+            .range([0,w]);
+    var y = d3.scale.linear()
+            .domain([0,100])
+            .rangeRound([0,h]);
+
+
+    var chart = d3.select("body").append("svg")
+            .attr("class","chart")
+            .attr("width", w*data.length-1)
+            .attr("height",h);
+
+    chart.selectAll("rect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x",function(d,i){
+                return x(i) - 0.5;
+            })
+            .attr("y",function(d,i){
+                return h - y(d.value) - 0.5;
+            })
+            .attr("width", w)
+            .attr("height",function(d){
+                return y(d.value);
+            });
+
+    chart.append("line")
+            .attr("x1", 0)
+            .attr("x2", w * data.length)
+            .attr("y1", h - .5)
+            .attr("y2", h - .5)
+            .style("stroke", "#000");
+
+    setInterval(function() {
+        data.shift();
+        data = data.concat(next(1));
+        redraw();
+    }, 1500);
+
+
+    function redraw() {
+
+        // Using time as a key, join the new data to the old nodes.
+        var rect = chart.selectAll("rect")
+                .data(data, function(d) { return d.time; });
+
+        // Enter…
+        rect.enter().insert("rect", "line")
+                .attr("x", function(d, i) { return x(i) - .5; })
+                .attr("y", function(d) { return h - y(d.value) - .5; })
+                .attr("width", w)
+                .attr("height", function(d) { return y(d.value); });
+
+        // Update…
+        rect.transition()
+                .duration(1000)
+                .attr("x", function(d, i) { return x(i) - .5; });
+
+        // Exit…
+        rect.exit()
+                .remove();
+
+    }
+</script>
+
+</body>
+</html>
