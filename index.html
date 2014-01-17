@@ -23,18 +23,46 @@
     data = data.concat(next(l));
     var requests = [];
 
+//    function next(num){
+//        var output = [];
+//        for (var i = 0; i < num; i++){
+//            output.push(
+//                    {
+//                        time : t++,
+//                        value : Math.random() * 100
+//                    }
+//            );
+//        }
+//        return output;
+//    }
+
     function next(num){
-        var output = [];
-        for (var i = 0; i < num; i++){
-            output.push(
-                    {
-                        time : t++,
-                        value : Math.random() * 100
-                    }
-            );
-        }
-        return output;
+        var returnData;
+        //request
+        $.ajax({
+            type: "GET",
+            url: "/getdata?num=" + num,
+            async: false,
+            success: function(data){
+                returnData = data;
+            }
+        });
+        return returnData;
     }
+
+//    function next(number){
+//        var returnData;
+//        $.ajax({
+//            url: '/getdata?num=' + number,
+//            dataType: "json",
+//            async: false,
+//            success: function (data) {
+//                returnData = data;
+//            }
+//        });
+//
+//        return returnData;
+//    }
 
     var w = 20;
     var h = 80;
@@ -139,7 +167,17 @@
 
 
     }
+    function reset(){
+        $.ajax({
+            url: '/reset',
+            type: 'POST',
+            data: {'time':$("#time").val()},
+            dataType: "json",
+            async: false
+        });
+    }
 </script>
-
+    Start Time <input type="text" id="time"><br>
+    <button onclick="reset()">Reset</button>
 </body>
 </html>
